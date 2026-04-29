@@ -1,87 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>FE RTB</title>
+  <title>Free Eligibility Check</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial;
-      background: #eef2f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .form-box {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      width: 320px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    h2 { margin-bottom: 10px; }
-    p { font-size: 14px; color: #555; }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
 </head>
-<body>
+<body style="font-family: Arial; text-align:center; margin-top:100px;">
 
-<div class="form-box">
-  <h2>FE RTB</h2>
-  <p>Enter your details to get connected</p>
+<h2>Free Eligibility Check</h2>
 
-  <form id="leadForm">
-    <input type="text" id="phone" placeholder="US Phone Number" required>
-    <input type="text" id="zipcode" placeholder="Zip Code" required>
-    <button type="submit">Check Now</button>
-  </form>
-</div>
+<form id="leadForm">
+  <input type="text" id="phone" placeholder="Phone Number"><br><br>
+  <input type="text" id="zipcode" placeholder="Zip Code"><br><br>
+  <button type="submit">Submit</button>
+</form>
 
 <script>
-document.getElementById("leadForm").addEventListener("submit", function(e) {
+document.getElementById("leadForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  let phoneInput = document.getElementById("phone").value;
+  let phone = document.getElementById("phone").value;
   let zip = document.getElementById("zipcode").value;
 
-  // Clean phone number (remove non-digits)
-  let cleaned = phoneInput.replace(/\D/g, '');
+  let cleaned = phone.replace(/\D/g, '');
 
-  // Validate US number (10 digits)
   if (cleaned.length !== 10) {
-    alert("Please enter a valid 10-digit US phone number");
+    alert("Enter valid US number");
     return;
   }
 
-  // Add +1 automatically
-  let finalCID = "+1" + cleaned;
+  let url = `/api/send?phone=${cleaned}&zip=${zip}`;
 
-  let url = `https://rtb.ringba.com/v1/production/618e2f522f3a467791b46a25f3f33cc5.json?CID=${finalCID}&zipcode=${zip}&subid=yes&exposeCallerId=yes`;
+  try {
+    let res = await fetch(url);
+    let data = await res.json();
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      alert("You're being connected now...");
-      console.log(data);
-    })
-    .catch(err => {
-      alert("Something went wrong");
-      console.log(err);
-    });
+    console.log(data);
+
+    if (data.error) {
+      alert("Error: " + data.error);
+    } else {
+      alert("Connected successfully!");
+    }
+
+  } catch (err) {
+    alert("Request failed");
+    console.log(err);
+  }
 });
 </script>
 
