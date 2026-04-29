@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FE RTB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial;
+      background: #eef2f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-box {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      width: 320px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    h2 { margin-bottom: 10px; }
+    p { font-size: 14px; color: #555; }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-box">
+  <h2>FE RTB</h2>
+  <p>Enter your details to get connected</p>
+
+  <form id="leadForm">
+    <input type="text" id="phone" placeholder="US Phone Number" required>
+    <input type="text" id="zipcode" placeholder="Zip Code" required>
+    <button type="submit">Check Now</button>
+  </form>
+</div>
+
+<script>
+document.getElementById("leadForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  let phoneInput = document.getElementById("phone").value;
+  let zip = document.getElementById("zipcode").value;
+
+  // Clean phone number (remove non-digits)
+  let cleaned = phoneInput.replace(/\D/g, '');
+
+  // Validate US number (10 digits)
+  if (cleaned.length !== 10) {
+    alert("Please enter a valid 10-digit US phone number");
+    return;
+  }
+
+  // Add +1 automatically
+  let finalCID = "+1" + cleaned;
+
+  let url = `https://rtb.ringba.com/v1/production/618e2f522f3a467791b46a25f3f33cc5.json?CID=${finalCID}&zipcode=${zip}&subid=yes&exposeCallerId=yes`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      alert("You're being connected now...");
+      console.log(data);
+    })
+    .catch(err => {
+      alert("Something went wrong");
+      console.log(err);
+    });
+});
+</script>
+
+</body>
+</html>
